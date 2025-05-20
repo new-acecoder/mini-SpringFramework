@@ -7,10 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * @Author Ace
- * @Date 2025/5/20 19:34
+ * @Date 2025/5/20 22:16
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface Component {
-    String value() default "";
+public @interface Scope {
+    String value();
 }

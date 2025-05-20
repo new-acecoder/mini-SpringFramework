@@ -1,6 +1,7 @@
 package com.ace.test;
 
 import com.ace.spring.applicationcontext.AceApplicationContext;
+import com.ace.test.config.AppConfig;
 
 /**
  * @Author Ace
@@ -8,6 +9,12 @@ import com.ace.spring.applicationcontext.AceApplicationContext;
  */
 public class Test {
     public static void main(String[] args) {
-        AceApplicationContext applicationContext = new AceApplicationContext();
+
+        AceApplicationContext applicationContext = new AceApplicationContext(AppConfig.class);
+
+        System.out.println(applicationContext.getBean("userService"));
+        System.out.println(applicationContext.getBean("userService"));
+        System.out.println(applicationContext.getBean("userService"));
+        System.out.println(applicationContext.getBean("userService"));
     }
 }

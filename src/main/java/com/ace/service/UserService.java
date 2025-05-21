@@ -1,5 +1,6 @@
 package com.ace.service;
 
+import com.ace.spring.annotation.Autowired;
 import com.ace.spring.annotation.Component;
 import com.ace.spring.annotation.Scope;
 
@@ -8,9 +9,13 @@ import com.ace.spring.annotation.Scope;
  * @Date 2025/5/20 19:33
  */
 @Component("userService")
-//@Scope("prototype")
+@Scope("singleton")
 public class UserService {
+
+//    @Autowired
+//    private OrderService orderService;
+
     public void add(){
-        System.out.println("add user");
+        System.out.println("UserService add...");
     }
 }

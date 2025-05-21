@@ -1,11 +1,13 @@
 package com.ace.spring.applicationcontext;
 
+import com.ace.spring.annotation.Autowired;
 import com.ace.spring.annotation.Component;
 import com.ace.spring.annotation.ComponentScan;
 import com.ace.spring.annotation.Scope;
 import com.ace.spring.core.BeanDefinition;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Map;
@@ -47,10 +49,23 @@ public class AceApplicationContext {
         try {
             Object instance = clazz.getDeclaredConstructor().newInstance();
 
+            //简单的依赖注入
+            //TODO 需要解决循环依赖问题
+            for (Field declaredField : clazz.getDeclaredFields()) {
+                //判断类中属性是否有@Autowired注解
+                if(declaredField.isAnnotationPresent(Autowired.class)) {
+                    //根据属性名调用getBean方法获取bean
+                    Object bean = getBean(declaredField.getName());
+                    //给属性赋值
+                    declaredField.setAccessible(true);
+                    declaredField.set(instance,bean);
+                }
+            }
 
             return instance;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
+            
         }
     }
     private void scanComponent(Class configClass) {
@@ -70,9 +85,7 @@ public class AceApplicationContext {
                     try {
                         Class<?> clazz = classLoader.loadClass(className);
                         if(clazz.isAnnotationPresent(Component.class)){
-                            //当前类是bean
-                            //Class->bean对象
-                            //解析类，判断当前bean是单例bean,还是prototype
+                            //解析类，判断当前bean是singleton bean,还是prototype bean
                             Component componentAnnotation = clazz.getDeclaredAnnotation(Component.class);
                             String beanName = componentAnnotation.value();
 
@@ -96,13 +109,20 @@ public class AceApplicationContext {
     }
 
     public Object getBean(String beanName){
-
         if(beanDefinitionMap.containsKey(beanName)){
             BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
             if(beanDefinition.getScope().equals("singleton")){
                 //singleton
-                Object o = singletonObjects.get(beanName);
-                return o;
+                if(singletonObjects.containsKey(beanName)){
+                    //如果单例池有，从单例池中获取
+                    Object o = singletonObjects.get(beanName);
+                    return o;
+                }else{
+                    //如果没有，创建bean对象加入到单例池中
+                    Object bean = createBean(beanDefinition);
+                    singletonObjects.put(beanName,bean);
+                    return bean;
+                }
             }else{
                 //prototype
                 //创建Bean对象
@@ -112,6 +132,5 @@ public class AceApplicationContext {
         }else{
             throw new RuntimeException("No such bean");
         }
-
     }
 }

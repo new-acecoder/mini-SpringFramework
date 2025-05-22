@@ -1,6 +1,5 @@
 package com.ace.test;
 
-import com.ace.service.EmployeeService;
 import com.ace.service.OrderService;
 import com.ace.service.UserService;
 import com.ace.spring.applicationcontext.AceApplicationContext;
@@ -15,7 +14,7 @@ public class Test {
 
         AceApplicationContext applicationContext = new AceApplicationContext(AppConfig.class);
 
-        EmployeeService employeeService = (EmployeeService) applicationContext.getBean("employeeService");
-        employeeService.test();
+        OrderService orderService = (OrderService) applicationContext.getBean("orderService");
+        orderService.add();
     }
 }
